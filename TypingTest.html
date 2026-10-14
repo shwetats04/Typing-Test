@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TypeMaster - Typing Speed Test</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+    --bg: #1a1040;
+    --card: #271a5c;
+    --line: #4c3a9e;
+    --text: #fff8ee;
+    --muted: #c4b8f0;
+    --pink: #ff4fa3;
+    --orange: #ff9f1c;
+    --yellow: #ffd93d;
+    --green: #3ddc97;
+    --cyan: #22d3ee;
+    --purple: #8b5cf6;
+}
+
+body {
+    font-family: "Trebuchet MS", Verdana, sans-serif;
+    background:
+        radial-gradient(circle at 10% 10%, rgba(255,79,163,.28), transparent 40%),
+        radial-gradient(circle at 90% 20%, rgba(34,211,238,.22), transparent 40%),
+        radial-gradient(circle at 50% 100%, rgba(255,159,28,.20), transparent 45%),
+        var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* floating background shapes */
+.float { position: fixed; z-index: 0; pointer-events: none; opacity: .55; }
+.f1 { top: 14%; left: 3%; width: 70px; animation: bob 6s ease-in-out infinite; }
+.f2 { top: 60%; right: 3%; width: 80px; animation: bob 7s ease-in-out infinite reverse; }
+.f3 { bottom: 8%; left: 6%; width: 60px; animation: bob 5s ease-in-out infinite; }
+@keyframes bob { 50% { transform: translateY(-18px) rotate(8deg); } }
+
+header, main, footer { position: relative; z-index: 1; }
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 8%;
+    border-bottom: 3px solid transparent;
+    border-image: linear-gradient(90deg, var(--pink), var(--orange), var(--yellow), var(--green), var(--cyan), var(--purple)) 1;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 26px;
+    font-weight: bold;
+    background: linear-gradient(90deg, var(--yellow), var(--pink));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+.logo svg { width: 38px; height: 38px; }
+
+header span.tag { color: var(--muted); font-size: 14px; }
+
+main { max-width: 900px; margin: 30px auto 50px; padding: 20px; }
+
+.intro { text-align: center; margin-bottom: 30px; }
+.hero-art { width: min(100%, 460px); height: auto; margin: 0 auto 10px; display: block; }
+.intro h1 { font-size: clamp(30px, 5vw, 46px); margin-bottom: 12px; }
+.intro h1 .grad {
+    background: linear-gradient(90deg, var(--cyan), var(--green), var(--yellow), var(--pink));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+.intro p { color: var(--muted); line-height: 1.6; }
+
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 22px; }
+.stat {
+    border-radius: 18px;
+    padding: 20px 10px;
+    text-align: center;
+    color: #1a1040;
+    box-shadow: 0 8px 0 rgba(0,0,0,.25);
+}
+.stat svg { width: 30px; height: 30px; margin-bottom: 4px; }
+.stat h2 { font-size: 34px; margin-bottom: 4px; }
+.stat p { font-size: 13px; font-weight: bold; }
+.s-time { background: linear-gradient(135deg, var(--yellow), var(--orange)); }
+.s-wpm  { background: linear-gradient(135deg, var(--cyan), var(--green)); }
+.s-acc  { background: linear-gradient(135deg, #ff9ecb, var(--pink)); }
+
+.test-box {
+    background: var(--card);
+    border: 2px solid var(--line);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 0 40px rgba(139,92,246,.35);
+}
+
+.toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+
+select, button {
+    padding: 11px 18px;
+    border-radius: 10px;
+    border: 2px solid var(--line);
+    background: var(--bg);
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: inherit;
+}
+button.primary {
+    background: linear-gradient(90deg, var(--pink), var(--orange));
+    border-color: transparent;
+    font-weight: bold;
+    color: #1a1040;
+}
+button:hover { opacity: .88; transform: translateY(-1px); }
+select:focus-visible, button:focus-visible, textarea:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
+
+.passage {
+    min-height: 150px;
+    padding: 18px;
+    border-radius: 12px;
+    background: var(--bg);
+    border: 2px dashed var(--line);
+    color: var(--muted);
+    font-size: 21px;
+    line-height: 1.9;
+    letter-spacing: .3px;
+    overflow-wrap: anywhere;
+}
+.passage span.correct { color: var(--green); }
+.passage span.wrong { color: #fff; background: var(--pink); border-radius: 3px; }
+.passage span.current { border-bottom: 3px solid var(--yellow); color: var(--yellow); }
+
+textarea {
+    width: 100%;
+    height: 110px;
+    margin-top: 18px;
+    padding: 16px;
+    resize: vertical;
+    background: var(--bg);
+    color: white;
+    border: 2px solid var(--line);
+    border-radius: 12px;
+    font-size: 17px;
+    line-height: 1.6;
+}
+textarea:focus { border-color: var(--cyan); }
+textarea:disabled { opacity: .7; }
+
+.hint { margin-top: 12px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+
+.result {
+    display: none;
+    margin-top: 20px;
+    padding: 22px;
+    text-align: center;
+    background: linear-gradient(160deg, #3b2a85, #1a1040);
+    border: 2px solid var(--yellow);
+    border-radius: 16px;
+}
+.result svg { width: 90px; height: 90px; }
+.result h2 { color: var(--yellow); margin: 6px 0 4px; }
+.result .badge { color: var(--green); font-weight: bold; margin-bottom: 10px; }
+.result p { margin: 8px 0; color: #efe9ff; }
+.result button { margin-top: 15px; }
+
+footer { text-align: center; padding: 25px; color: var(--muted); font-size: 13px; }
+
+@media (max-width: 600px) {
+    header { padding: 16px 5%; }
+    header span.tag { display: none; }
+    main { margin: 20px auto; padding: 15px; }
+    .stats { gap: 8px; }
+    .stat { padding: 14px 5px; }
+    .stat h2 { font-size: 25px; }
+    .stat p { font-size: 11px; }
+    .test-box { padding: 15px; }
+    .passage { font-size: 18px; }
+    .float { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .float, .rocket { animation: none !important; }
+}
+
+.rocket { animation: bob 4s ease-in-out infinite; transform-origin: center; }
+</style>
+</head>
+
+<body>
+
+<!-- decorative floating shapes -->
+<svg class="float f1" viewBox="0 0 100 100" aria-hidden="true"><polygon points="50,5 61,38 96,38 68,58 79,92 50,72 21,92 32,58 4,38 39,38" fill="#ffd93d"/></svg>
+<svg class="float f2" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="40" fill="none" stroke="#22d3ee" stroke-width="14"/></svg>
+<svg class="float f3" viewBox="0 0 100 100" aria-hidden="true"><rect x="15" y="15" width="70" height="70" rx="16" fill="#ff4fa3" transform="rotate(20 50 50)"/></svg>
+
+<header>
+    <div class="logo">
+        <svg viewBox="0 0 48 48" aria-hidden="true">
+            <rect x="3" y="12" width="42" height="26" rx="6" fill="#ff4fa3"/>
+            <g fill="#fff8ee">
+                <rect x="9" y="18" width="5" height="5" rx="1"/><rect x="17" y="18" width="5" height="5" rx="1"/>
+                <rect x="25" y="18" width="5" height="5" rx="1"/><rect x="33" y="18" width="5" height="5" rx="1"/>
+                <rect x="15" y="27" width="22" height="5" rx="1"/>
+            </g>
+        </svg>
+        TypeAdda
+    </div>
+    <span class="tag">Improve your typing</span>
+</header>
+
+<main>
+    <section class="intro">
+        <!-- hero illustration: laptop + rocket + stars -->
+        <svg class="hero-art" viewBox="0 0 460 230" role="img" aria-label="A rocket flying above a colorful keyboard">
+            <defs>
+                <linearGradient id="kb" x1="0" x2="1">
+                    <stop offset="0" stop-color="#8b5cf6"/><stop offset="1" stop-color="#22d3ee"/>
+                </linearGradient>
+            </defs>
+            <g fill="#ffd93d">
+                <circle cx="40" cy="40" r="4"/><circle cx="420" cy="60" r="5"/>
+                <circle cx="90" cy="110" r="3"/><circle cx="380" cy="130" r="3"/>
+                <circle cx="330" cy="30" r="3"/>
+            </g>
+            <path d="M60 80 q15 -22 35 0 q18 -20 38 0 z" fill="#c4b8f0" opacity=".5"/>
+            <path d="M330 100 q15 -22 35 0 q18 -20 38 0 z" fill="#c4b8f0" opacity=".5"/>
+
+            <g class="rocket">
+                <path d="M230 18 C260 40 262 90 250 120 L210 120 C198 90 200 40 230 18 Z" fill="#fff8ee"/>
+                <circle cx="230" cy="68" r="14" fill="#22d3ee" stroke="#1a1040" stroke-width="4"/>
+                <path d="M210 100 L186 132 L212 124 Z" fill="#ff4fa3"/>
+                <path d="M250 100 L274 132 L248 124 Z" fill="#ff4fa3"/>
+                <path d="M216 122 L230 168 L244 122 Z" fill="#ff9f1c"/>
+                <path d="M222 122 L230 150 L238 122 Z" fill="#ffd93d"/>
+            </g>
+
+            <rect x="70" y="170" width="320" height="52" rx="14" fill="url(#kb)"/>
+            <g fill="#fff8ee">
+                <rect x="88"  y="180" width="26" height="14" rx="4"/><rect x="120" y="180" width="26" height="14" rx="4"/>
+                <rect x="152" y="180" width="26" height="14" rx="4"/><rect x="184" y="180" width="26" height="14" rx="4"/>
+                <rect x="216" y="180" width="26" height="14" rx="4"/><rect x="248" y="180" width="26" height="14" rx="4"/>
+                <rect x="280" y="180" width="26" height="14" rx="4"/><rect x="312" y="180" width="26" height="14" rx="4"/>
+                <rect x="344" y="180" width="26" height="14" rx="4"/>
+                <rect x="120" y="200" width="220" height="14" rx="4" fill="#ffd93d"/>
+            </g>
+        </svg>
+
+        <h1>Test Your <span class="grad">Typing Speed</span></h1>
+        <p>Practice every day. Type faster. Make fewer mistakes.</p>
+    </section>
+
+    <section class="stats">
+        <div class="stat s-time">
+            <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="17" r="11" fill="none" stroke="#1a1040" stroke-width="3"/><path d="M16 10v8l5 3" fill="none" stroke="#1a1040" stroke-width="3" stroke-linecap="round"/><rect x="12" y="2" width="8" height="3" rx="1.5" fill="#1a1040"/></svg>
+            <h2 id="time">60</h2>
+            <p>Seconds Left</p>
+        </div>
+
+        <div class="stat s-wpm">
+            <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M18 2L6 18h8l-2 12 14-18h-9z" fill="#1a1040"/></svg>
+            <h2 id="wpm">0</h2>
+            <p>Words Per Minute</p>
+        </div>
+
+        <div class="stat s-acc">
+            <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="12" fill="none" stroke="#1a1040" stroke-width="3"/><circle cx="16" cy="16" r="6" fill="none" stroke="#1a1040" stroke-width="3"/><circle cx="16" cy="16" r="1.8" fill="#1a1040"/></svg>
+            <h2 id="accuracy">100%</h2>
+            <p>Accuracy</p>
+        </div>
+    </section>
+
+    <section class="test-box">
+        <div class="toolbar">
+            <select id="duration" aria-label="Test duration">
+                <option value="30">30 Seconds</option>
+                <option value="60" selected>60 Seconds</option>
+                <option value="120">120 Seconds</option>
+            </select>
+
+            <button id="restart" class="primary">Restart Test ↻</button>
+        </div>
+
+        <div id="passage" class="passage"></div>
+
+        <textarea
+            id="input"
+            placeholder="Click here and start typing the text above..."
+            aria-label="Type the displayed passage here"
+            spellcheck="false"
+            autocomplete="off"
+            autocapitalize="off"
+        ></textarea>
+
+        <p class="hint">
+            Start typing to begin the timer. Green = correct,
+            pink = incorrect. Complete the passage or wait for
+            the timer to finish.
+        </p>
+
+        <div id="result" class="result" aria-live="polite">
+            <svg viewBox="0 0 100 100" aria-hidden="true">
+                <path d="M30 14h40v28a20 20 0 0 1-40 0z" fill="#ffd93d"/>
+                <path d="M30 22H14c0 18 8 26 20 28M70 22h16c0 18-8 26-20 28" fill="none" stroke="#ff9f1c" stroke-width="6"/>
+                <rect x="44" y="60" width="12" height="14" fill="#ff9f1c"/>
+                <rect x="30" y="74" width="40" height="10" rx="4" fill="#ff4fa3"/>
+                <path d="M50 24l4 9 10 1-7 7 2 10-9-5-9 5 2-10-7-7 10-1z" fill="#fff8ee"/>
+            </svg>
+            <h2>Test Completed!</h2>
+            <p class="badge" id="badge">Great job!</p>
+            <p>Typing Speed: <strong id="finalWpm">0 WPM</strong></p>
+            <p>Accuracy: <strong id="finalAccuracy">100%</strong></p>
+            <p>Correct Characters: <strong id="correctChars">0</strong></p>
+            <p>Incorrect Characters: <strong id="wrongChars">0</strong></p>
+
+            <button id="tryAgain" class="primary">Try Again</button>
+        </div>
+    </section>
+</main>
+
+<footer>
+    TypeMaster © 2026 | Practice makes progress
+</footer>
+
+<script>
+const passages = [
+    "Learning web development requires patience and regular practice. HTML creates the structure, CSS makes the website attractive, and JavaScript adds interactive features. Small projects help beginners improve their skills.",
+
+    "Success comes from consistent effort and a willingness to learn. Every mistake gives us an opportunity to improve. Focus on accuracy first and gradually increase your typing speed.",
+
+    "A good website should be simple, responsive, and easy to use. Developers combine creativity with logic to build useful digital experiences. Practice coding every day to improve your skills.",
+
+    "JavaScript makes websites interactive and dynamic. HTML provides the structure, CSS controls the design, and JavaScript handles user interactions. Building projects is an effective way to learn programming."
+];
+
+const passageElement = document.getElementById("passage");
+const input = document.getElementById("input");
+const timeElement = document.getElementById("time");
+const wpmElement = document.getElementById("wpm");
+const accuracyElement = document.getElementById("accuracy");
+const durationSelect = document.getElementById("duration");
+const resultElement = document.getElementById("result");
+
+const finalWpm = document.getElementById("finalWpm");
+const finalAccuracy = document.getElementById("finalAccuracy");
+const correctCharsElement = document.getElementById("correctChars");
+const wrongCharsElement = document.getElementById("wrongChars");
+const badgeElement = document.getElementById("badge");
+
+let passageText = "";
+let timeLeft = 60;
+let timer = null;
+let started = false;
+let finished = false;
+let startTime = 0;
+
+function choosePassage() {
+    return passages[Math.floor(Math.random() * passages.length)];
+}
+
+function renderPassage() {
+    const typed = input.value;
+    passageElement.innerHTML = "";
+
+    for (let i = 0; i < passageText.length; i++) {
+        const span = document.createElement("span");
+        span.textContent = passageText[i];
+
+        if (i < typed.length) {
+            span.classList.add(typed[i] === passageText[i] ? "correct" : "wrong");
+        } else if (i === typed.length && !finished) {
+            span.classList.add("current");
+        }
+
+        passageElement.appendChild(span);
+    }
+}
+
+function getStats() {
+    const typed = input.value;
+    let correct = 0;
+    let wrong = 0;
+
+    for (let i = 0; i < typed.length; i++) {
+        if (i < passageText.length && typed[i] === passageText[i]) {
+            correct++;
+        } else {
+            wrong++;
+        }
+    }
+
+    const elapsedMinutes = Math.max((Date.now() - startTime) / 60000, 1 / 60000);
+    const wpm = started ? Math.round((correct / 5) / elapsedMinutes) : 0;
+    const accuracy = typed.length ? Math.round((correct / typed.length) * 100) : 100;
+
+    return { correct, wrong, wpm, accuracy };
+}
+
+function updateStats() {
+    const stats = getStats();
+    wpmElement.textContent = stats.wpm;
+    accuracyElement.textContent = stats.accuracy + "%";
+}
+
+function startTimer() {
+    if (started || finished) return;
+
+    started = true;
+    startTime = Date.now();
+
+    timer = setInterval(() => {
+        timeLeft--;
+        timeElement.textContent = timeLeft;
+        updateStats();
+        if (timeLeft <= 0) finishTest();
+    }, 1000);
+}
+
+function getBadge(wpm) {
+    if (wpm >= 60) return "Lightning fingers!";
+    if (wpm >= 40) return "Great speed, keep going!";
+    if (wpm >= 20) return "Nice start, practice more!";
+    return "Every expert started here!";
+}
+
+function finishTest() {
+    if (finished) return;
+
+    finished = true;
+    clearInterval(timer);
+    input.disabled = true;
+
+    const stats = getStats();
+
+    finalWpm.textContent = stats.wpm + " WPM";
+    finalAccuracy.textContent = stats.accuracy + "%";
+    correctCharsElement.textContent = stats.correct;
+    wrongCharsElement.textContent = stats.wrong;
+    badgeElement.textContent = getBadge(stats.wpm);
+
+    resultElement.style.display = "block";
+    renderPassage();
+}
+
+function resetTest() {
+    clearInterval(timer);
+
+    timeLeft = Number(durationSelect.value);
+    started = false;
+    finished = false;
+    startTime = 0;
+
+    input.value = "";
+    input.disabled = false;
+
+    timeElement.textContent = timeLeft;
+    wpmElement.textContent = "0";
+    accuracyElement.textContent = "100%";
+
+    resultElement.style.display = "none";
+
+    passageText = choosePassage();
+    renderPassage();
+
+    input.focus();
+}
+
+input.addEventListener("input", () => {
+    if (finished) return;
+
+    if (input.value.length > passageText.length) {
+        input.value = input.value.slice(0, passageText.length);
+    }
+
+    if (input.value.length > 0) startTimer();
+
+    renderPassage();
+    updateStats();
+
+    if (input.value.length === passageText.length) finishTest();
+});
+
+document.getElementById("restart").addEventListener("click", resetTest);
+document.getElementById("tryAgain").addEventListener("click", resetTest);
+durationSelect.addEventListener("change", resetTest);
+
+resetTest();
+</script>
+
+</body>
+</html> typing test kr ka ha website
